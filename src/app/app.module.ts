@@ -8,6 +8,8 @@ import { ButtonModule } from 'primeng/components/button/button';
 import { RadioButtonModule } from 'primeng/components/radioButton/radioButton';
 import { DropdownModule } from 'primeng/dropdown';
 import { TableModule } from 'primeng/table';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { DialogModule } from 'primeng/dialog';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
@@ -20,10 +22,16 @@ import { HttpService } from './service/HttpService';
 import { Injector } from '@angular/core';
 import { setInjector } from './util/AppInjector';
 
+import { AdDirective } from './component/AdDirective';
+import { TimetableModalComponent } from './component/TimetableModalComponent';
+import {AbstractDynamicLoadingComponent} from './component/AbstractDynamicLoadingComponent';
+
+
+
 
 
 @NgModule({
-	declarations: [AppComponent, TimetableComponent],
+	declarations: [AppComponent, TimetableComponent, TimetableModalComponent, AbstractDynamicLoadingComponent, AdDirective],
 	imports: [
 		HttpClientModule,
 		BrowserModule,
@@ -35,9 +43,14 @@ import { setInjector } from './util/AppInjector';
 		RadioButtonModule,
 		TableModule,
 		DropdownModule,
+		AutoCompleteModule,
+		DialogModule,
+		
 	],
+	entryComponents: [TimetableModalComponent],
 	providers: [HttpService],
-	bootstrap: [AppComponent]
+	bootstrap: [AppComponent],
+
 })
 
 export class AppModule {
