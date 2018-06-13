@@ -9,7 +9,7 @@ import {EventCarrier,EventEnum} from '../util/EventCarrier';
 @Component({
 	template: `
 <p-dialog header="Тут что-то будет" [(visible)]="inputData.display" [modal]="true" [responsive]="true" [width]="350" [minWidth]="250" [minY]="120">
-  <div *ngFor="let row of rooms; let i = index;">
+  <div *ngFor="let row of rows; let i = index;">
     <p-dropdown [options]="inputData.lecturers" placeholder="Преподаватель" [(ngModel)]="rows[i].lecturer"></p-dropdown>
     <p-dropdown [options]="inputData.rooms" placeholder="Кабинет" [(ngModel)]="rows[i].room"></p-dropdown>
     <button (click)="removeElement(i)">X</button>
@@ -28,15 +28,12 @@ export class TimetableModalComponent implements AdComponent, AfterContentInit  {
 	@Output() outputData: EventEmitter<EventCarrier> = new EventEmitter<EventCarrier>();
 
 	rows: TimetableRow[] = [];
-	lecturers:any[];
-	rooms:any[];
 
 	constructor() {
-
+		
 	}
 
 	ngAfterContentInit() {
-		console.log(this.inputData);
 		this.rows = this.inputData.array;
 	}
 
@@ -53,19 +50,4 @@ export class TimetableModalComponent implements AdComponent, AfterContentInit  {
 		this.outputData.emit(new EventCarrier(EventEnum.SUBMIT,this.rows));
 	}
 
-	getLecturerById(id: number): string {
-		for(let i=0;i<this.lecturers.length;i++) {
-			if(new Number(this.lecturers[i].value)==id) {
-				return this.lecturers[i].label;
-			}
-		}
-	}
-
-	getRoomById(id: number): string {
-		for(let i=0;i<this.rooms.length;i++) {
-			if(new Number(this.rooms[i].value)==id) {
-				return this.rooms[i].label;
-			}
-		}
-	}
 }

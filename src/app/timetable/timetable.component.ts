@@ -75,14 +75,12 @@ export class TimetableComponent {
 
 	displayModal(i) {
 		this.rowIndex = i;
-		this.items[0].data.array = this.lessons[this.rowIndex].rows;
+		this.items[0].data.array = this.copyRowsValues();
 		this.items[0].data.display = true;
-		console.log(this.lessons[this.rowIndex].rows);
 		this.component.loadComponent();
 	}
 
 	receiveEvents(event) {
-		console.log("data"+event.data);
 		if (event.type == EventEnum.SUBMIT) {
 			this.lessons[this.rowIndex].rows = event.data;
 		}
@@ -104,7 +102,7 @@ export class TimetableComponent {
 		}
 	}
 
-	getRowsValues():TimetableRow[] {
+	copyRowsValues():TimetableRow[] {
 		let array: TimetableRow[] = [];
 		this.lessons[this.rowIndex].rows.map(row => {
 			let target:TimetableRow = new TimetableRow();
