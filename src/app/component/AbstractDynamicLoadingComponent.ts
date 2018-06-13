@@ -1,9 +1,11 @@
-import { Component, Input, OnInit, ViewChild, ComponentFactoryResolver, OnDestroy, AfterViewInit, QueryList } from '@angular/core';
-import {appInjector} from '../util/AppInjector';
+import { Component, Input, Output, OnInit, ViewChild, ComponentFactoryResolver, OnDestroy, AfterViewInit, QueryList, EventEmitter } from '@angular/core';
+import { appInjector } from '../util/AppInjector';
 
 import { AdDirective } from './AdDirective';
 import { AdItems } from './AdItems';
 import { AdComponent } from './AdComponent';
+
+import { EventEnum, EventCarrier } from '../util/EventCarrier';
 
 
 @Component({
@@ -14,27 +16,20 @@ export class AbstractDynamicLoadingComponent implements OnInit, OnDestroy {
 	private ads: AdItems[];
 	currentAdIndex = -1;
 	@ViewChild(AdDirective) adHost: AdDirective;
-	//private adHost: AdDirective;
 	@Input('data') data: any;
-	interval: any;
+	@Output() events: EventEmitter<EventCarrier> = new EventEmitter<EventCarrier>();
 
-	constructor(private componentFactoryResolver: ComponentFactoryResolver ) {
-		
-	 }
 
-	/*ngAfterViewInit() {
-		this.hosts.changes.subscribe((comps: QueryList<AdDirective>)=> {
-			this.adHost=comps.first;
-			console.log(this.adHost);
-		});*/
-		ngOnInit() {
-		this.ads=this.data;
-		this.loadComponent();
-		this.getAds();
+	constructor(private componentFactoryResolver: ComponentFactoryResolver) {
+
+	}
+
+	ngOnInit() {
+		this.reloadComponents();
 	}
 
 	ngOnDestroy() {
-		clearInterval(this.interval);
+		this.adHost.viewContainerRef.clear();
 	}
 
 	loadComponent() {
@@ -42,22 +37,26 @@ export class AbstractDynamicLoadingComponent implements OnInit, OnDestroy {
 		let adItem = this.ads[this.currentAdIndex];
 
 		let componentFactory = this.componentFactoryResolver.resolveComponentFactory(adItem.component);
-		console.log(this.ads);
 
 		let viewContainerRef = this.adHost.viewContainerRef;
+
 		viewContainerRef.clear();
 
 		let componentRef = viewContainerRef.createComponent(componentFactory);
+
+		componentRef.instance.outputData.subscribe(carrier => this.sendEvents(carrier));
+
 		(<AdComponent>componentRef.instance).inputData = adItem.data;
 	}
 
-	getAds() {
-		this.interval = setInterval(() => {
-			this.loadComponent();
-		}, 3000);
+
+	reloadComponents() {
+		this.ads = this.data;
+		this.loadComponent();
 	}
 
-	setAds(ads: AdItems[]) {
-		this.ads = ads;
+	sendEvents(carrier: EventCarrier) {
+		this.events.emit(carrier);
 	}
+
 }

@@ -1,5 +1,6 @@
+import {TimetableRow} from '../entity/TimetableRow';
+
 export class TimetableItem {
 	subject: string;
-	lecturer: string;
-	room: string;
+	rows: TimetableRow[];
 }

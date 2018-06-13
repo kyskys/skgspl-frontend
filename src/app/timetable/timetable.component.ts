@@ -1,13 +1,15 @@
-import { ViewChild,ElementRef,Component } from '@angular/core';
+import { ViewChild, ElementRef, Component } from '@angular/core';
 import { TimetableItem } from '../entity/TimetableItem';
 import { GroupService } from '../service/GroupService';
 import { SubjectService } from '../service/SubjectService';
 import { UserService } from '../service/UserService';
 import { SelectItem } from 'primeng/api';
-import {AbstractDynamicLoadingComponent} from '../component/AbstractDynamicLoadingComponent';
-import {TimetableModalComponent} from '../component/TimetableModalComponent';
-import {AdItems} from '../component/AdItems';
+import { AbstractDynamicLoadingComponent } from '../component/AbstractDynamicLoadingComponent';
+import { TimetableModalComponent } from '../component/TimetableModalComponent';
+import { AdItems } from '../component/AdItems';
 import { AdDirective } from '../component/AdDirective';
+import { EventCarrier, EventEnum } from '../util/EventCarrier';
+import {TimetableRow} from '../entity/TimetableRow';
 
 @Component({
 	selector: 'app-timetable',
@@ -16,7 +18,8 @@ import { AdDirective } from '../component/AdDirective';
 })
 export class TimetableComponent {
 
-	@ViewChild("addRowDiv") addRowDiv:ElementRef;
+	@ViewChild("addRowDiv") addRowDiv: ElementRef;
+	@ViewChild(AbstractDynamicLoadingComponent) component:AbstractDynamicLoadingComponent;
 
 	subjectService: SubjectService = new SubjectService();
 	groupService: GroupService = new GroupService();
@@ -24,21 +27,18 @@ export class TimetableComponent {
 	days: string[] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница"];
 	lessons: TimetableItem[] = TimetableItem[20];
 	groups: SelectItem[] = [];
-	lecturers: SelectItem[] = [];
+	lecturers: SelectItem[] = [{ label: "lect a", value: 1 }, { label: "lect b", value: 2 }, { label: "lect c", value: 3 }];
 	subjects: SelectItem[] = [];
+	rooms: SelectItem[] = [{ label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }];
 	filteredSubjects: SelectItem[] = [];
-	display=false;
+	display = false;
 	lecturer: any;
-	room:any;
-	rooms: SelectItem[] = [{label:"1",value:1},{label:"2",value:2},{label:"3",value:3}];
-	items:AdItems[] =  [new AdItems(TimetableModalComponent,{lecturers:this.lecturers,rooms:this.rooms})];
+	room: any;
+	rowIndex: number;
+	items: AdItems[] = [new AdItems(TimetableModalComponent, { lecturers: this.lecturers, rooms: this.rooms, display: false, array:[] })];;
 	constructor() {
 		this.lessons = [
-			{ subject: "1", lecturer: "1", room: "1" }, { subject: "2", lecturer: "2", room: "2" }, { subject: "3", lecturer: "3", room: "3" }, { subject: "4", lecturer: "4", room: "4" },
-			{ subject: "5", lecturer: "5", room: "5" }, { subject: "6", lecturer: "6", room: "6" }, { subject: "7", lecturer: "7", room: "7" }, { subject: "8", lecturer: "8", room: "8" },
-			{ subject: "9", lecturer: "9", room: "9" }, { subject: "10", lecturer: "10", room: "10" }, { subject: "11", lecturer: "11", room: "11" }, { subject: "12", lecturer: "12", room: "12" },
-			{ subject: "13", lecturer: "13", room: "13" }, { subject: "14", lecturer: "14", room: "14" }, { subject: "15", lecturer: "15", room: "15" }, { subject: "16", lecturer: "16", room: "16" },
-			{ subject: "17", lecturer: "17", room: "17" }, { subject: "18", lecturer: "18", room: "18" }, { subject: "19", lecturer: "19", room: "19" }, { subject: "20", lecturer: "20", room: "20" },
+			{ subject: "1", rows:[{lecturer:1,room:1}] }, 
 		];
 		this.subjectService.getDictionary().subscribe(data => {
 			data.map(subject => {
@@ -58,38 +58,59 @@ export class TimetableComponent {
 	}
 
 
-	 search(event) {
-       let filtered : any[] = [];
-        for(let i = 0; i < this.subjects.length; i++) {
-            let subject = this.subjects[i];
-            if(subject.label.toLowerCase().includes(event.query.toLowerCase()) == true) {
-                filtered.push(subject);
-            }
-        }
-        this.filteredSubjects = filtered;
-    }
+	search(event) {
+		let filtered: any[] = [];
+		for (let i = 0; i < this.subjects.length; i++) {
+			let subject = this.subjects[i];
+			if (subject.label.toLowerCase().includes(event.query.toLowerCase()) == true) {
+				filtered.push(subject);
+			}
+		}
+		this.filteredSubjects = filtered;
+	}
 
-    check(event) {
-    	var target = event.currentTarget;
-    	var pElement = target.parentElement.parentElement;
-    	var pClass = pElement.attributes.class;
-    	console.log(this.lessons[0]);
-    }
+	check(event) {
+		console.log(this.lessons[0]);
+	}
 
-    displayModal() {
-    	this.display=true;
-    }
+	displayModal(i) {
+		this.rowIndex = i;
+		this.items[0].data.array = this.lessons[this.rowIndex].rows;
+		this.items[0].data.display = true;
+		console.log(this.lessons[this.rowIndex].rows);
+		this.component.loadComponent();
+	}
 
-    removeElement(event) {
-    	var target = event.currentTarget;
-    	var pElement = target.parentElement;
-    	pElement.remove();
-    }
+	receiveEvents(event) {
+		console.log("data"+event.data);
+		if (event.type == EventEnum.SUBMIT) {
+			this.lessons[this.rowIndex].rows = event.data;
+		}
+	}
 
-    addRow(event) {
-    	this.items.push(new AdItems(TimetableModalComponent,{lecturers:[{label:"1",value:1},{label:"2",value:2},{label:"3",value:3}],rooms:this.rooms}));
-    	//this.addRowDiv.nativeElement.insertAdjacentHTML('beforebegin','<p><p-dropdown [options]="lecturers" [(ngModel)]="lecturer"></p-dropdown><p-dropdown [options]="lecturers" [(ngModel)]="room"></p-dropdown><button (click)="removeElement($event)">X</button></p>');
-    }
+	getLecturerById(id: number): string {
+		for(let i=0;i<this.lecturers.length;i++) {
+			if(new Number(this.lecturers[i].value)==id) {
+				return this.lecturers[i].label;
+			}
+		}
+	}
 
+	getRoomById(id: number): string {
+		for(let i=0;i<this.rooms.length;i++) {
+			if(new Number(this.rooms[i].value)==id) {
+				return this.rooms[i].label;
+			}
+		}
+	}
 
+	getRowsValues():TimetableRow[] {
+		let array: TimetableRow[] = [];
+		this.lessons[this.rowIndex].rows.map(row => {
+			let target:TimetableRow = new TimetableRow();
+			Object.assign(target, row);
+			array.push(target);
+		});
+		return array;
+	}
 }
