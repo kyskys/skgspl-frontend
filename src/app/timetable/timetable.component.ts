@@ -1,7 +1,9 @@
 import { ViewChild, ElementRef, Component } from '@angular/core';
 import { TimetableItem } from '../entity/TimetableItem';
 import { GroupService } from '../service/GroupService';
+import { LessonService } from '../service/LessonService';
 import { SubjectService } from '../service/SubjectService';
+import { RoomService } from '../service/RoomService';
 import { UserService } from '../service/UserService';
 import { SelectItem } from 'primeng/api';
 import { AbstractDynamicLoadingComponent } from '../component/AbstractDynamicLoadingComponent';
@@ -10,6 +12,7 @@ import { AdItems } from '../component/AdItems';
 import { AdDirective } from '../component/AdDirective';
 import { EventCarrier, EventEnum } from '../util/EventCarrier';
 import {TimetableRow} from '../entity/TimetableRow';
+import * as moment from 'moment';
 
 @Component({
 	selector: 'app-timetable',
@@ -17,42 +20,64 @@ import {TimetableRow} from '../entity/TimetableRow';
 	styleUrls: ['./timetable.component.css']
 })
 export class TimetableComponent {
-
-	@ViewChild("addRowDiv") addRowDiv: ElementRef;
+	
 	@ViewChild(AbstractDynamicLoadingComponent) component:AbstractDynamicLoadingComponent;
 
 	subjectService: SubjectService = new SubjectService();
 	groupService: GroupService = new GroupService();
 	userService: UserService = new UserService();
-	days: string[] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница"];
-	lessons: TimetableItem[] = TimetableItem[20];
+	lessonService: LessonService = new LessonService();
+	roomService: RoomService = new RoomService();
+	daysOfWeek: string[] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница"];
+	lessons: TimetableItem[] = Array<TimetableItem>();
 	groups: SelectItem[] = [];
-	lecturers: SelectItem[] = [{ label: "lect a", value: 1 }, { label: "lect b", value: 2 }, { label: "lect c", value: 3 }];
+	lecturers: SelectItem[] = [];
 	subjects: SelectItem[] = [];
-	rooms: SelectItem[] = [{ label: "1", value: 1 }, { label: "2", value: 2 }, { label: "3", value: 3 }];
+	rooms: SelectItem[] = [];
 	filteredSubjects: SelectItem[] = [];
 	display = false;
 	lecturer: any;
 	room: any;
 	rowIndex: number;
 	items: AdItems[] = [new AdItems(TimetableModalComponent, { lecturers: this.lecturers, rooms: this.rooms, display: false, array:[] })];;
+	weeks: SelectItem[] = [];
+	selectedWeek:SelectItem;
+
 	constructor() {
-		this.lessons = [
-			{ subject: "1", rows:[{lecturer:1,room:1}] }, 
-		];
+		
 		this.subjectService.getDictionary().subscribe(data => {
-			data.map(subject => {
+			data.forEach(subject => {
 				this.subjects.push({ label: subject.name, value: subject.id });
 			});
 		});
 		this.groupService.getDictionary().subscribe(data => {
-			data.map(group => {
+			data.forEach(group => {
 				this.groups.push({ label: group.name, value: group.id });
 			});
 		});
 		this.userService.getLecturerDictionary().subscribe(data => {
-			data.map(lecturer => {
+			data.forEach(lecturer => {
 				this.lecturers.push({ label: lecturer.name, value: lecturer.id });
+			});
+		});
+		this.roomService.getDictionary().subscribe(data => {
+			data.forEach(room => {
+				this.rooms.push({ label: room.name, value: room.id });
+			});
+		});
+		this.lessons.length=25;
+		for(let i=0;i<this.lessons.length;i++) {
+			this.lessons[i] = {subject:"",date:Math.floor(i/5+1),time:i%5+1,locations:[{lecturer:-1,room:-1}]};
+		}
+		console.log(this.lessons);
+		let dateWeek: any = "isoWeek";
+    let dateFormat: any = "DD/MM/YYYY";
+    let startDay = moment().startOf(dateWeek);
+		this.lessonService.getTimetableByWeek(startDay.format(dateFormat),1).subscribe(data => {
+			data.forEach( item => {
+				let lesson = this.lessons.filter(lesson => lesson.date==item.date&&lesson.time==item.time)[0];
+				lesson.subject=item.subject;
+				lesson.locations=item.locations;
 			});
 		});
 	}
@@ -69,10 +94,6 @@ export class TimetableComponent {
 		this.filteredSubjects = filtered;
 	}
 
-	check(event) {
-		console.log(this.lessons[0]);
-	}
-
 	displayModal(i) {
 		this.rowIndex = i;
 		this.items[0].data.array = this.copyRowsValues();
@@ -82,7 +103,7 @@ export class TimetableComponent {
 
 	receiveEvents(event) {
 		if (event.type == EventEnum.SUBMIT) {
-			this.lessons[this.rowIndex].rows = event.data;
+			this.lessons[this.rowIndex].locations = event.data;
 		}
 	}
 
@@ -103,12 +124,19 @@ export class TimetableComponent {
 	}
 
 	copyRowsValues():TimetableRow[] {
-		let array: TimetableRow[] = [];
-		this.lessons[this.rowIndex].rows.map(row => {
-			let target:TimetableRow = new TimetableRow();
-			Object.assign(target, row);
-			array.push(target);
+		return this.lessons[this.rowIndex].locations.map(row => {
+			return Object.assign(new TimetableRow(), row);
 		});
-		return array;
 	}
+
+	generateDays() {
+    let dateWeek: any = "isoWeek";
+    let dateFormat: any = "DD/MM/YYYY";
+    let startDay = moment().startOf(dateWeek).add(35,'d');
+    let endDay = moment().endOf(dateWeek).add(35,'d');
+  	for (var i = 0; i <=8; i++) {
+  		this.weeks.push(
+        {label:startDay.subtract(7,'d').format(dateFormat)+" - "+endDay.subtract(7,'d').format(dateFormat),value:startDay.format(dateFormat)});
+    }
+  }
 }

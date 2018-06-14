@@ -1,5 +1,5 @@
 
-    <button (click)="getLecturerById(1)">asd</button>
+    <p-dropdown [options]="days" [(ngModel)]="selectedWeek" required="true" [filter]="true" placeholder="Select a date"></p-dropdown>
 <p-table [value]="lessons">
     <ng-template pTemplate="header">
         <tr>
@@ -12,8 +12,8 @@
     </ng-template> 
     <ng-template pTemplate="body" let-rowData let-i="rowIndex">
         <tr>
-            <td *ngIf="i % 4 == 0" rowspan="4">{{days[ i / 4 ]}}</td>
-            <td>{{ (i % 4) + 1 }}</td>
+            <td *ngIf="i % 5 == 0" rowspan="5">{{daysOfWeek[ i / 5 ]}}</td>
+            <td>{{ (i % 5) + 1 }}</td>
             <td pEditableColumn>
                 <p-cellEditor>
                     <ng-template pTemplate="input">
@@ -25,16 +25,15 @@
                 </p-cellEditor>
             </td>
             <td (click)="displayModal(i)">
-            <p *ngFor="let row of rowData.rows">
+            <ul><li *ngFor="let row of rowData.locations">
                         {{getLecturerById(row.lecturer)}}
-            <p>
+            </li></ul>
              </td>
              <td (click)="displayModal(i)">
-            <p *ngFor="let row of rowData.rows">
+            <ul><li *ngFor="let row of rowData.locations">
                         {{getRoomById(row.room)}}
-            <p>
+            </li></ul>
              </td>
-            <td> <button (click)="check($event)">me</button></td>
         </tr>
     </ng-template>
 </p-table>

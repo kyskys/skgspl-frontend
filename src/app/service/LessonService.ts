@@ -1,3 +1,4 @@
+import { Inject } from '@angular/core';
 //import {SearchableService} from '../search/SearchableService';
 //import {GroupSearchParams} from'../search/params/GroupSearchParams';
 //import {DataTableParams} from '../data-table';
@@ -9,8 +10,8 @@ import { DictionaryItem } from '../entity/DictionaryItem';
 import {AbstractService} from './AbstractService';
 
 
-export class RoomService extends AbstractService {//implements SearchableService<GroupSearchParams, GroupMainDto> {
-	url: string = "http://localhost:8080/rest/api/room/";
+export class LessonService extends AbstractService {//implements SearchableService<GroupSearchParams, GroupMainDto> {
+	url: string = "http://localhost:8080/rest/api/lesson/";
 
 	/*get(id: number):Observable<GroupMainDto> {
 		let resultUrl=this.url+id+"/";
@@ -36,6 +37,10 @@ export class RoomService extends AbstractService {//implements SearchableService
 	addStudentsToGroup(array: any, id:number):Observable<any> {
 		return this.http.doPost(this.url+id+"/add/student", array);
 	}*/
+
+	getTimetableByWeek(day:string, group: number) {
+		return this.getHttpService().doGet(this.url+"timetable/"+group+"?day="+day);
+	}
 
 	getDictionary(): Observable<DictionaryItem[]> {
 		return this.getHttpService().doGet(this.url + "dictionary");
