@@ -22,6 +22,10 @@ export class HttpService {
 		return this.http.get(url);//, {observe: "body", headers: {'Auth': this.auth.getToken()}});
 	}
 
+	doGetWithProperties(url: string, properties:any): any {
+		return this.http.get(url, properties);//, {observe: "body", headers: {'Auth': this.auth.getToken()}});
+	}
+
 	doPost(url: string, body: any): any {
 		return this.http.post(url, body);//, this.setAuthHeader());
 	}

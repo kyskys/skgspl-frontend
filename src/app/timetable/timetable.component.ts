@@ -11,7 +11,7 @@ import { TimetableModalComponent } from '../component/TimetableModalComponent';
 import { AdItems } from '../component/AdItems';
 import { AdDirective } from '../component/AdDirective';
 import { EventCarrier, EventEnum } from '../util/EventCarrier';
-import {TimetableRow} from '../entity/TimetableRow';
+import { TimetableRow } from '../entity/TimetableRow';
 import * as moment from 'moment';
 
 @Component({
@@ -20,8 +20,8 @@ import * as moment from 'moment';
 	styleUrls: ['./timetable.component.css']
 })
 export class TimetableComponent {
-	
-	@ViewChild(AbstractDynamicLoadingComponent) component:AbstractDynamicLoadingComponent;
+
+	@ViewChild(AbstractDynamicLoadingComponent) component: AbstractDynamicLoadingComponent;
 
 	subjectService: SubjectService = new SubjectService();
 	groupService: GroupService = new GroupService();
@@ -29,6 +29,8 @@ export class TimetableComponent {
 	lessonService: LessonService = new LessonService();
 	roomService: RoomService = new RoomService();
 	daysOfWeek: string[] = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница"];
+	dateFormat: any = "DD/MM/YYYY";
+	dateWeek: any = "isoWeek";
 	lessons: TimetableItem[] = Array<TimetableItem>();
 	groups: SelectItem[] = [];
 	lecturers: SelectItem[] = [];
@@ -39,12 +41,15 @@ export class TimetableComponent {
 	lecturer: any;
 	room: any;
 	rowIndex: number;
-	items: AdItems[] = [new AdItems(TimetableModalComponent, { lecturers: this.lecturers, rooms: this.rooms, display: false, array:[] })];;
+	items: AdItems[] = [new AdItems(TimetableModalComponent, { lecturers: this.lecturers, rooms: this.rooms, display: false, array: [] })];;
 	weeks: SelectItem[] = [];
-	selectedWeek:SelectItem;
+	selectedWeek: SelectItem;
+	selectedGroup:SelectItem;
 
 	constructor() {
-		
+		this.lessons.length = 20;
+		this.clearTimetableData();
+		this.generateDays();
 		this.subjectService.getDictionary().subscribe(data => {
 			data.forEach(subject => {
 				this.subjects.push({ label: subject.name, value: subject.id });
@@ -65,21 +70,6 @@ export class TimetableComponent {
 				this.rooms.push({ label: room.name, value: room.id });
 			});
 		});
-		this.lessons.length=25;
-		for(let i=0;i<this.lessons.length;i++) {
-			this.lessons[i] = {subject:"",date:Math.floor(i/5+1),time:i%5+1,locations:[{lecturer:-1,room:-1}]};
-		}
-		console.log(this.lessons);
-		let dateWeek: any = "isoWeek";
-    let dateFormat: any = "DD/MM/YYYY";
-    let startDay = moment().startOf(dateWeek);
-		this.lessonService.getTimetableByWeek(startDay.format(dateFormat),1).subscribe(data => {
-			data.forEach( item => {
-				let lesson = this.lessons.filter(lesson => lesson.date==item.date&&lesson.time==item.time)[0];
-				lesson.subject=item.subject;
-				lesson.locations=item.locations;
-			});
-		});
 	}
 
 
@@ -92,6 +82,59 @@ export class TimetableComponent {
 			}
 		}
 		this.filteredSubjects = filtered;
+	}
+
+	clearTimetableData() {
+		for (let i = 0; i < this.lessons.length; i++) {
+			this.lessons[i] = { subject: { label: "", value: 0 }, date: Math.floor(i / 4 + 1), time: i % 4 + 1, locations: [] };
+		}
+	}
+
+	loadTimetableData() {
+		this.clearTimetableData();
+		this.lessonService.getTimetableByWeek(this.selectedWeek, this.selectedGroup).subscribe(data => {
+			data.forEach(item => {
+				let lesson = this.lessons.filter(lesson => lesson.date == item.date && lesson.time == item.time)[0];
+				lesson.subject = this.getSubjectById(item.subject);
+				lesson.locations = item.locations;
+			});
+		});
+	}
+
+	updateTimetable() {
+		let startDay = moment().startOf(this.dateWeek).subtract(7,'d');
+		let array = [];
+		this.lessons.forEach(lesson => {
+			if (lesson.locations.length!==0) {
+				lesson.subject=lesson.subject.value;
+				array.push(lesson);
+			}
+		});
+		this.lessonService.updateTimetable(this.selectedWeek, this.selectedGroup, array);
+	}
+
+	downloadTimetablePDF() {
+		this.lessonService.downloadTimetablePDF(this.selectedWeek).subscribe(res => {
+			var binaryData = [];
+			binaryData.push(res);
+			var url = window.URL.createObjectURL(new Blob(binaryData, {type: "application/pdf"}));
+        var a = document.createElement('a');
+        document.body.appendChild(a);
+        a.setAttribute('style', 'display: none');
+        a.href = url;
+        a.download = "raspisanie";
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove(); // remove the element
+      }, error => {
+        console.log('download error:', JSON.stringify(error));
+      }, () => {
+        console.log('Completed file download.')
+      });
+	}
+
+	check() {
+		console.log(this.lessons);
 	}
 
 	displayModal(i) {
@@ -108,35 +151,48 @@ export class TimetableComponent {
 	}
 
 	getLecturerById(id: number): string {
-		for(let i=0;i<this.lecturers.length;i++) {
-			if(new Number(this.lecturers[i].value)==id) {
+		for (let i = 0; i < this.lecturers.length; i++) {
+			if (new Number(this.lecturers[i].value) == id) {
 				return this.lecturers[i].label;
 			}
 		}
 	}
 
 	getRoomById(id: number): string {
-		for(let i=0;i<this.rooms.length;i++) {
-			if(new Number(this.rooms[i].value)==id) {
+		for (let i = 0; i < this.rooms.length; i++) {
+			if (new Number(this.rooms[i].value) == id) {
 				return this.rooms[i].label;
 			}
 		}
 	}
 
-	copyRowsValues():TimetableRow[] {
+	getSubjectById(id: number): SelectItem {
+		for (let i = 0; i < this.subjects.length; i++) {
+			if (new Number(this.subjects[i].value) == id) {
+				return this.subjects[i];
+			}
+		}
+	}
+
+	copyRowsValues(): TimetableRow[] {
 		return this.lessons[this.rowIndex].locations.map(row => {
 			return Object.assign(new TimetableRow(), row);
 		});
 	}
 
 	generateDays() {
-    let dateWeek: any = "isoWeek";
-    let dateFormat: any = "DD/MM/YYYY";
-    let startDay = moment().startOf(dateWeek).add(35,'d');
-    let endDay = moment().endOf(dateWeek).add(35,'d');
-  	for (var i = 0; i <=8; i++) {
-  		this.weeks.push(
-        {label:startDay.subtract(7,'d').format(dateFormat)+" - "+endDay.subtract(7,'d').format(dateFormat),value:startDay.format(dateFormat)});
-    }
-  }
+		let startDay = moment().startOf(this.dateWeek).add(35, 'd');
+		let endDay = moment().endOf(this.dateWeek).add(35, 'd');
+		for (var i = 0; i <= 8; i++) {
+			this.weeks.push(
+				{ label: startDay.subtract(7, 'd').format(this.dateFormat) + " - " + endDay.subtract(7, 'd').format(this.dateFormat), value: startDay.format(this.dateFormat) });
+		}
+	}
+
+
+
+	clearRow(i) {
+		this.lessons[i] = { subject: { label: "", value: 0 }, date: Math.floor(i / 4 + 1), time: i % 4 + 1, locations: [] };
+	}
+
 }

@@ -1,8 +1,9 @@
 import {TimetableRow} from '../entity/TimetableRow';
+import {SelectItem} from 'primeng/api';
 
 export class TimetableItem {
 	time: number;
 	date:number;
-	subject: string;
+	subject: SelectItem;
 	locations: TimetableRow[];
 }

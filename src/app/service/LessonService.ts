@@ -2,12 +2,15 @@ import { Inject } from '@angular/core';
 //import {SearchableService} from '../search/SearchableService';
 //import {GroupSearchParams} from'../search/params/GroupSearchParams';
 //import {DataTableParams} from '../data-table';
+import { ResponseContentType } from '@angular/http';
+import {HttpHeaders} from '@angular/common/http'
 import { HttpService } from '../service/HttpService';
 import { Observable } from "rxjs/Rx";
 //import {GroupMainDto} from '../entity/GroupMainDto';
 //import {GroupDto} from '../entity/GroupDto';
 import { DictionaryItem } from '../entity/DictionaryItem';
 import {AbstractService} from './AbstractService';
+import{TimetableItem} from '../entity/TimetableItem';
 
 
 export class LessonService extends AbstractService {//implements SearchableService<GroupSearchParams, GroupMainDto> {
@@ -38,13 +41,25 @@ export class LessonService extends AbstractService {//implements SearchableServi
 		return this.http.doPost(this.url+id+"/add/student", array);
 	}*/
 
-	getTimetableByWeek(day:string, group: number) {
+	getTimetableByWeek(day:any, group: any) {
 		return this.getHttpService().doGet(this.url+"timetable/"+group+"?day="+day);
 	}
 
 	getDictionary(): Observable<DictionaryItem[]> {
 		return this.getHttpService().doGet(this.url + "dictionary");
 	}
+
+	updateTimetable(day: any, group:any, data:any) {
+		this.getHttpService().doPost(this.url+"timetable/"+group+"?day="+day,data).subscribe(data =>{
+			console.log("asd");
+		});
+	}
+
+	downloadTimetablePDF(day:any):any {
+		return this.getHttpService().doGetWithProperties(this.url+"timetable/report?day="+day, 
+			{ headers: new HttpHeaders(), responseType: 'blob', observe: 'body' });
+	}
+
 	/*
 		getGroupsByPairId(id: number): Observable<GroupMainDto[]> {
 			let result: string = this.url+"pair/"+id;
