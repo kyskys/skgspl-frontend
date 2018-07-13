@@ -10,6 +10,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { TableModule } from 'primeng/table';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { DialogModule } from 'primeng/dialog';
+import {ListboxModule} from 'primeng/listbox';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
@@ -25,13 +26,23 @@ import { setInjector } from './util/AppInjector';
 import { AdDirective } from './component/AdDirective';
 import { TimetableModalComponent } from './component/TimetableModalComponent';
 import {AbstractDynamicLoadingComponent} from './component/AbstractDynamicLoadingComponent';
+import { RoleTableComponent } from './role/table/table.component';
+import { AbstractListEditComponentComponent } from './component/abstract-list-edit-component/abstract-list-edit-component.component';
 
 
 
 
 
 @NgModule({
-	declarations: [AppComponent, TimetableComponent, TimetableModalComponent, AbstractDynamicLoadingComponent, AdDirective],
+	declarations: [
+		AppComponent, 
+		TimetableComponent, 
+		TimetableModalComponent, 
+		AbstractDynamicLoadingComponent, 
+		AdDirective, 
+		RoleTableComponent, 
+		AbstractListEditComponentComponent,
+		],
 	imports: [
 		HttpClientModule,
 		BrowserModule,
@@ -45,6 +56,7 @@ import {AbstractDynamicLoadingComponent} from './component/AbstractDynamicLoadin
 		DropdownModule,
 		AutoCompleteModule,
 		DialogModule,
+		ListboxModule,
 		
 	],
 	entryComponents: [TimetableModalComponent],

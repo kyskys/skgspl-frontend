@@ -1,0 +1,16 @@
+.list-container-flex {
+	display: flex;
+	justify-content: space-around;
+}
+
+:host ::ng-deep.ui-listbox-list {
+	max-height: 16em;
+	min-height: 16em;
+}
+
+.list-button-flex {
+	display: flex;;
+	justify-content: space-evenly;
+	flex-direction: column;
+	align-items: center;
+}

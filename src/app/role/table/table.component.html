@@ -1,0 +1,29 @@
+<p-button label="Создать"></p-button>
+<p-button [disabled]="!isOneSelected()" label="Редактировать"></p-button>
+<p-button [disabled]="!isManySelected()" label="Удалить"></p-button>
+<p-table [value]="roles" selectionMode="multiple" [(selection)]="selectedRoles" [paginator]="true" [rows]="10">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Роли</th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-role let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="role" [pSelectableRowIndex]="rowIndex">
+            <td>{{role.name}}</td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+        <ul>
+            <li *ngFor="let role of selectedRoles" style="text-align: left">
+                {{role.id + ' - ' + role.name}}
+            </li>
+        </ul>
+    </ng-template>
+</p-table>
+<p-dialog #create [(visible)]="isCreateModalDisplaying" [modal]="true" [responsive]="true">
+    <input type="text" name="role" label="role...">
+    <app-abstract-list-edit-component #list [inputAvailable]="roles" (submit)="receiveChanges($event)"></app-abstract-list-edit-component>
+    <p-footer>
+        <p-button label="Подтвердить" (click)="list.emitAvailable(); list.emitUsed();"><
+    </p-footer>
+</p-dialog>

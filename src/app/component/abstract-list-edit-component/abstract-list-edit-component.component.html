@@ -1,0 +1,14 @@
+<div class="list-container-flex">
+  <div>
+    <p-listbox #used class="abstract-list" [options]="usedItems" dataKey="id" [(ngModel)]="selectedUsedItems" multiple="multiple" filter="filter" optionLabel="name">
+    </p-listbox>
+  </div>
+  <div class="list-button-flex">
+    <p-button icon="fa fa-angle-double-left" (click)="moveAllAvailableToUsed()"></p-button>
+    <p-button icon="fa fa-angle-left" (click)="moveAvailableToUsed()"></p-button>
+    <p-button icon="fa fa-angle-right" (click)="moveUsedToAvailable()"></p-button>
+    <p-button icon="fa fa-angle-double-right" (click)="moveAllUsedToAvailable()"></p-button>
+  </div>
+  <p-listbox #available [options]="availableItems" dataKey="id" [(ngModel)]="selectedAvailableItems" multiple="multiple" filter="filter" optionLabel="name">
+  </p-listbox>
+</div>
