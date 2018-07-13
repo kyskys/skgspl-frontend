@@ -27,7 +27,7 @@ import { AdDirective } from './component/AdDirective';
 import { TimetableModalComponent } from './component/TimetableModalComponent';
 import {AbstractDynamicLoadingComponent} from './component/AbstractDynamicLoadingComponent';
 import { RoleTableComponent } from './role/table/table.component';
-import { AbstractListEditComponentComponent } from './component/abstract-list-edit-component/abstract-list-edit-component.component';
+import { AbstractListEditComponent } from './component/abstract-list-edit/abstract-list-edit.component';
 
 
 
@@ -41,7 +41,7 @@ import { AbstractListEditComponentComponent } from './component/abstract-list-ed
 		AbstractDynamicLoadingComponent, 
 		AdDirective, 
 		RoleTableComponent, 
-		AbstractListEditComponentComponent,
+		AbstractListEditComponent,
 		],
 	imports: [
 		HttpClientModule,

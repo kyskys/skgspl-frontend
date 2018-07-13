@@ -1,5 +1,7 @@
 import { Component, OnInit,ViewChild } from '@angular/core';
-import {RoleTableDto} from '../../entity/role/RoleTableDto';
+import {RoleTableDto} from '../../entity/role/RoleTableDto'
+import {AbstractListEditComponent} from '../../component/abstract-list-edit/abstract-list-edit.component';
+import {DictionaryItem} from '../../entity/DictionaryItem';
 
 @Component({
   selector: 'app-roletable',
@@ -8,13 +10,19 @@ import {RoleTableDto} from '../../entity/role/RoleTableDto';
 })
 export class RoleTableComponent implements OnInit {
 
+  @ViewChild(AbstractListEditComponent)
+  list: AbstractListEditComponent; 
+
   roles: RoleTableDto[];
 
   selectedRoles:RoleTableDto[] = [];
 
-  isCreateModalDisplaying = true;
+  isModalDisplaying = true;
 
-  testData = [];
+  availablePrivilegies: DictionaryItem[] = [];
+  usedPrivilegies: DictionaryItem[] = [];
+
+  currentRole: RoleTableDto;
 
   constructor() { }
 
@@ -25,7 +33,10 @@ export class RoleTableComponent implements OnInit {
     {id:10,name:"role A"},{id:11,name:"role B"},{id:12,name:"role C"},
     {id:13,name:"role A"},{id:14,name:"role B"},{id:15,name:"role C"},
     {id:16,name:"role A"},{id:17,name:"role B"},{id:18,name:"role C"},
-    {id:19,name:"role A"},{id:20,name:"role B"},{id:21,name:"role C"}]
+    {id:19,name:"role A"},{id:20,name:"role B"},{id:21,name:"role C"}];
+    this.availablePrivilegies=[{id:1,name:"priv A"},{id:2,name:"priv B"},{id:3,name:"priv C"},
+    {id:4,name:"priv A"},{id:5,name:"priv B"},{id:6,name:"priv C"},
+    {id:7,name:"priv A"},{id:8,name:"priv B"},{id:9,name:"priv C"}];
   }
 
 
@@ -37,7 +48,23 @@ export class RoleTableComponent implements OnInit {
       return this.selectedRoles.length!==0;
     }
 
-    test() {
-      console.log(this.roles);
+    createRole() {
+      this.currentRole=new RoleTableDto();
+      this.usedPrivilegies=[];
+      this.isModalDisplaying=true;
+    }
+
+    updateRole() {
+      this.currentRole=Object.assign(new RoleTableDto(),this.selectedRoles[0]);
+      this.usedPrivilegies=[{id:1,name:"priv A"},{id:2,name:"priv B"},{id:3,name:"priv C"}];
+      this.isModalDisplaying=true;
+    }
+
+    modalSubmitAction() {
+
+    }
+
+    receiveChanges(event) {
+      this.list.getUsedItems;
     }
 }

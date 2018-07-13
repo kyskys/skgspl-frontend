@@ -1,5 +1,5 @@
-<p-button label="Создать"></p-button>
-<p-button [disabled]="!isOneSelected()" label="Редактировать"></p-button>
+<p-button label="Создать" (click)="createRole()"></p-button>
+<p-button [disabled]="!isOneSelected()" label="Редактировать" (click)="updateRole()"></p-button>
 <p-button [disabled]="!isManySelected()" label="Удалить"></p-button>
 <p-table [value]="roles" selectionMode="multiple" [(selection)]="selectedRoles" [paginator]="true" [rows]="10">
     <ng-template pTemplate="header">
@@ -20,10 +20,10 @@
         </ul>
     </ng-template>
 </p-table>
-<p-dialog #create [(visible)]="isCreateModalDisplaying" [modal]="true" [responsive]="true">
-    <input type="text" name="role" label="role...">
-    <app-abstract-list-edit-component #list [inputAvailable]="roles" (submit)="receiveChanges($event)"></app-abstract-list-edit-component>
+<p-dialog #create [(visible)]="isModalDisplaying" [modal]="true" [responsive]="true">
+    <input type="text" name="role" label="role..." value="{{currentRole==undefined?'':currentRole.name}}">
+    <app-abstract-list-edit [availableItems]="availablePrivilegies" [usedItems]="usedPrivilegies"></app-abstract-list-edit>
     <p-footer>
-        <p-button label="Подтвердить" (click)="list.emitAvailable(); list.emitUsed();"><
+        <p-button label="Подтвердить" (click)="modalSubmitAction()"></p-button>
     </p-footer>
 </p-dialog>
