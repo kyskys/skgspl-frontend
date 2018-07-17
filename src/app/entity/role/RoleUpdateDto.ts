@@ -1,4 +1,4 @@
-export class RoleCreateDto {
+export class RoleUpdateDto {
 	name: string;
 	authorities: number[];
 }

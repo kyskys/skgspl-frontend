@@ -1,6 +1,6 @@
 <p-button label="Создать" (click)="createRole()"></p-button>
 <p-button [disabled]="!isOneSelected()" label="Редактировать" (click)="updateRole()"></p-button>
-<p-button [disabled]="!isManySelected()" label="Удалить"></p-button>
+<p-button [disabled]="!isManySelected()" label="Удалить" (click)="deleteRole()"></p-button>
 <p-table [value]="roles" selectionMode="multiple" [(selection)]="selectedRoles" [paginator]="true" [rows]="10">
     <ng-template pTemplate="header">
         <tr>
@@ -21,9 +21,9 @@
     </ng-template>
 </p-table>
 <p-dialog #create [(visible)]="isModalDisplaying" [modal]="true" [responsive]="true">
-    <input type="text" name="role" label="role..." value="{{currentRole==undefined?'':currentRole.name}}">
+    <input type="text" [(ngModel)]="roleName" label="role..." value="{{currentRole==undefined?'':currentRole.name}}">
     <app-abstract-list-edit [availableItems]="availablePrivilegies" [usedItems]="usedPrivilegies"></app-abstract-list-edit>
     <p-footer>
-        <p-button label="Подтвердить" (click)="modalSubmitAction()"></p-button>
+        <p-button label="Подтвердить" (click)="submit()"></p-button>
     </p-footer>
 </p-dialog>

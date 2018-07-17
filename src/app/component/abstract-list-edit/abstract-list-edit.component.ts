@@ -33,45 +33,47 @@ export class AbstractListEditComponent implements OnInit {
 
   constructor() { }
 
+  test(event) {
+    console.log(event);
+  }
+
   ngOnInit() {
-  	/*this.availableItems=[{id:1,name:"role A"},{id:2,name:"role B"},{id:3,name:"role C"},
-    {id:4,name:"role A"},{id:5,name:"role B"},{id:6,name:"role C"},
-    {id:7,name:"role A"},{id:8,name:"role B"},{id:9,name:"role C"},
-    {id:10,name:"role A"},{id:11,name:"role B"},{id:12,name:"role C"},
-    {id:13,name:"role A"},{id:14,name:"role B"},{id:15,name:"role C"},
-    {id:16,name:"role A"},{id:17,name:"role B"},{id:18,name:"role C"},
-    {id:19,name:"role A"},{id:20,name:"role B"},{id:21,name:"role C"}]*/
+  	// this._availableItems=[{id:1,name:"role A"},{id:2,name:"role B"},{id:3,name:"role C"},
+   //  {id:4,name:"role A"},{id:5,name:"role B"},{id:6,name:"role C"},
+   //  {id:7,name:"role A"},{id:8,name:"role B"},{id:9,name:"role C"},
+   //  {id:10,name:"role A"},{id:11,name:"role B"},{id:12,name:"role C"},
+   //  {id:13,name:"role A"},{id:14,name:"role B"},{id:15,name:"role C"},
+   //  {id:16,name:"role A"},{id:17,name:"role B"},{id:18,name:"role C"},
+   //  {id:19,name:"role A"},{id:20,name:"role B"},{id:21,name:"role C"}];
   }
 
   private moveAvailableToUsed() {
   	for(let i=0;i<this.selectedAvailableItems.length;i++) {
   		this._usedItems = [...this._usedItems, this.selectedAvailableItems[i]];
-  		let index = this.availableItems.indexOf(this.selectedAvailableItems[i]);
-      this.availableItems.splice(index,1);
-      this.availableItems = [...[],...this.availableItems];
+  		let index = this._availableItems.indexOf(this.selectedAvailableItems[i]);
+      this._availableItems.splice(index,1);
+      this._availableItems = [...[],...this._availableItems];
   	}
   	this.selectedAvailableItems = [];
-    this.inputAvailable = this.availableItems;
   }
 
   private moveUsedToAvailable() {
   	for(let i=0;i<this.selectedUsedItems.length;i++) {
-  		this.availableItems = [...this.availableItems, this.selectedUsedItems[i]];
+  		this._availableItems = [...this._availableItems, this.selectedUsedItems[i]];
   		let index = this._usedItems.indexOf(this.selectedUsedItems[i]);
   		this._usedItems.splice(index,1);
       this._usedItems=[...[],...this._usedItems];
   	}
   	this.selectedUsedItems = [];
-    this.inputAvailable = this.availableItems;
   }
 
   private moveAllAvailableToUsed() {
-    this._usedItems = [...this._usedItems,...this.availableItems];
-    this.availableItems= [];
+    this._usedItems = [...this._usedItems,...this._availableItems];
+    this._availableItems= [];
   }
 
   private moveAllUsedToAvailable() {
-    this.availableItems=[...this.availableItems,...this._usedItems];
+    this._availableItems=[...this._availableItems,...this._usedItems];
     this._usedItems = [];
   }
 
