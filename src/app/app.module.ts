@@ -28,6 +28,7 @@ import { TimetableModalComponent } from './component/TimetableModalComponent';
 import {AbstractDynamicLoadingComponent} from './component/AbstractDynamicLoadingComponent';
 import { RoleTableComponent } from './role/table/table.component';
 import { AbstractListEditComponent } from './component/abstract-list-edit/abstract-list-edit.component';
+import { UserTableComponent } from './user/table/table.component';
 
 
 
@@ -41,7 +42,8 @@ import { AbstractListEditComponent } from './component/abstract-list-edit/abstra
 		AbstractDynamicLoadingComponent, 
 		AdDirective, 
 		RoleTableComponent, 
-		AbstractListEditComponent,
+		AbstractListEditComponent, 
+		UserTableComponent,
 		],
 	imports: [
 		HttpClientModule,
@@ -57,7 +59,7 @@ import { AbstractListEditComponent } from './component/abstract-list-edit/abstra
 		AutoCompleteModule,
 		DialogModule,
 		ListboxModule,
-		
+
 	],
 	entryComponents: [TimetableModalComponent],
 	providers: [HttpService],

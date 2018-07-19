@@ -4,6 +4,7 @@ import {Observable} from "rxjs/Rx";
 //import {UserDetails} from '../entity/UserDetails';
 //import {RoleEnum} from '../entity/RoleEnum';
 import { DictionaryItem } from '../entity/DictionaryItem';
+import {UserAuthoritiesDto} from '../entity/user/UserAuthoritiesDto';
 import {AbstractService} from './AbstractService';
 
 export class UserService extends AbstractService {
@@ -32,4 +33,21 @@ export class UserService extends AbstractService {
 	getLecturerDictionary(): Observable<DictionaryItem[]> {
 		return this.getHttpService().doGet(this.url + "lecturer/dictionary");
 	}
+
+	getUserDictionary():Observable<DictionaryItem[]> {
+		return this.getHttpService().doGet(this.url+"user/dictionary");
+	}
+
+	getUserAuthorities(user:number):Observable<UserAuthoritiesDto>{
+		return this.getHttpService().doGet(this.url+user+"/authorities")
+	}
+
+	updateUserRole(user:number, role:number): Observable<any> {
+		return this.getHttpService().doPost(this.url+user+"/role",role);
+	}
+
+	updateUserAuthorities(user:number, authorities: number[]):Observable<any> {
+		return this.getHttpService().doPost(this.url+user+"/authorities",authorities);
+	}
+
 }

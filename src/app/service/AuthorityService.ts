@@ -45,6 +45,10 @@ export class AuthorityService extends AbstractService{//implements SearchableSer
 	getDictionaryByRole(id:number):Observable<DictionaryItem[]> {
 		return this.getHttpService().doGet(this.url + "dictionary/role/"+id);
 	}
+
+	getDictionaryByUser(id:number):Observable<DictionaryItem[]> {
+		return this.getHttpService().doGet(this.url+"dictionary/user/"+id);
+	}
 	/*
 		getAuthoritysByPairId(id: number): Observable<AuthorityMainDto[]> {
 			let result: string = this.url+"pair/"+id;

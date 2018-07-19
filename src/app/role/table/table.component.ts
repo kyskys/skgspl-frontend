@@ -7,7 +7,7 @@ import {RoleService} from '../../service/RoleService';
 import {AuthorityService} from '../../service/AuthorityService';
 
 @Component({
-  selector: 'app-roletable',
+  selector: 'app-role-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.css']
 })

@@ -1,0 +1,36 @@
+<p-table [value]="users" selectionMode="multiple" [(selection)]="selectedUsers" [paginator]="true" [rows]="10">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Пользователи</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-role let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="role" [pSelectableRowIndex]="rowIndex">
+            <td>{{role.name}}</td>
+            <td><p-button label="Привилегии" (click)="updateAuthorities(rowIndex)"></p-button></td>
+            <td><p-button label="Детали" (click)="updateDetails(rowIndex)"></p-button></td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+        <ul>
+            <li *ngFor="let role of selectedRoles" style="text-align: left">
+                {{role.id + ' - ' + role.name}}
+            </li>
+        </ul>
+    </ng-template>
+</p-table>
+<p-dialog #authorities [(visible)]="isAuthoritiesModalDisplaying" [modal]="true" [responsive]="true">
+    <div class="ui-g-12"><p-radioButton name="auth" value="role" label="Роль" [(ngModel)]="authType" inputId="opt1"></p-radioButton></div>
+    <div class="ui-g-12" *ngIf="authType=='role'">
+    	<p-dropdown [options]="roles" [(ngModel)]="selectedRole" optionLabel="name"></p-dropdown>
+    </div>
+    <div class="ui-g-12"><p-radioButton name="auth" value="authority" label="Привилегии" [(ngModel)]="authType" inputId="opt2"></p-radioButton></div>
+    <div class="ui-g-12" *ngIf="authType=='authority'">
+    <app-abstract-list-edit [availableItems]="availableAuthorities" [usedItems]="usedAuthorities"></app-abstract-list-edit>
+	</div>
+    <p-footer>
+        <p-button label="Подтвердить" (click)="submit()"></p-button>
+    </p-footer>
+</p-dialog>
